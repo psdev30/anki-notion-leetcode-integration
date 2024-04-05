@@ -127,8 +127,7 @@ def update_notion_problem_entry(problem_id, anki_card_id, next_review_date):
     if response.status_code == 200:
         search_results = response.json()
         print(search_results)
-
-def 
+ 
 
 if __name__ == "__main__":
 
