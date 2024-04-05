@@ -13,7 +13,7 @@ notion_headers = {
     "Content-Type": "application/json"
 }
 
-def get_all_pages():
+def find_notion_problem_id(problem_title):
     query = {
         "filter": {
             "value": "page",
@@ -22,17 +22,25 @@ def get_all_pages():
     }
 
     # Send the POST request to the Notion API
-    response = requests.post(f"{os.getenv('NOTION-BASE-URL')}/v1/search", headers=notion_headers, json=query)
+    response = requests.post(f"{os.getenv('NOTION-BASE-URL')}/v1/search", 
+        headers=notion_headers, json=query)
 
 
     # Check if the request was successful
     if response.status_code == 200:
         search_results = response.json()["results"]
-        # You can also print additional properties or the entire page object
-        print(search_results)
+        page_id = None
+        for result in search_results:
+            if result["properties"]["Name"]["title"][0]["text"]["content"].lower() == problem_title.lower():
+                page_id = result["id"]
+                print(page_id)
+                return page_id
+                
+        if not page_id:
+            print(f"No page found with the name '{problem_title}'")
 
     else:
-        print(f"Error: {response.status_code} - {response.text}")
+        print(f"Error: {response.status_code}: {response.text}")
 
 def get_notion_page(query):
     # Define the search query
@@ -76,10 +84,10 @@ if len(sys.argv) != 2:
     sys.exit(1)
 
 # Get the command-line arguments
-question = sys.argv[1]
+problem_title = sys.argv[1]
 
 # Use the arguments in your script
-print(f"Argument 1: {question}")
+print(f"Argument 1: {problem_title}")
 
 def get_card(deck_name, question):
     params = {
@@ -102,5 +110,27 @@ def get_card(deck_name, question):
     data = response.json()
     print(data)
 
+def update_notion_problem_entry(problem_id, anki_card_id, next_review_date):
+    query = {
+        "properties": {
+            "anki_card_id": {  "number": anki_card_id },
+            "next_review": { 
+                "date": { "start": next_review_date }
+            }
+        }
+    }
 
-get_all_pages()
+    response = requests.patch(f"{os.getenv('NOTION-BASE-URL')}/v1/pages/{problem_id}",
+        headers=notion_headers, json=query)
+    
+    print(response.text)
+    if response.status_code == 200:
+        search_results = response.json()
+        print(search_results)
+
+def 
+
+if __name__ == "__main__":
+
+    problem_id = find_notion_problem_id(problem_title=problem_title)
+    update_notion_problem_entry(problem_id=problem_id, anki_card_id=1234, next_review_date="2024-03-04")
