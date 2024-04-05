@@ -7,8 +7,7 @@ import urllib.parse
 
 load_dotenv()
 # Define the Notion API endpoint and headers
-notion_api_url = "https://api.notion.com/v1/search"
-headers = {
+notion_headers = {
     "Authorization": f"Bearer {os.getenv('NOTION-SECRET-KEY')}",
     "Notion-Version": "2022-06-28",
     "Content-Type": "application/json"
@@ -23,7 +22,8 @@ def get_all_pages():
     }
 
     # Send the POST request to the Notion API
-    response = requests.post(notion_api_url, headers=headers, json=query)
+    response = requests.post(f"{os.getenv('NOTION-BASE-URL')}/v1/search", headers=notion_headers, json=query)
+
 
     # Check if the request was successful
     if response.status_code == 200:
@@ -48,7 +48,7 @@ def get_notion_page(query):
     }
 
     # Send the POST request to the Notion API
-    response = requests.post(notion_api_url, headers=headers, json=query)
+    response = requests.post(os.getenv("NOTION-BASE-URL"), headers=notion_headers, json=query)
 
     # Check if the request was successful
     if response.status_code == 200:
